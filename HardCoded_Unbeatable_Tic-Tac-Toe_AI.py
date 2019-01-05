@@ -103,6 +103,9 @@ def aiTurn(board, move, prevList):
         else:
             rand = 2 * random.randint(0, 1);
             prev = int((prev + 3 + rand) % 4)
+            if (getCellByNum(board, cornerToRegNum(prev)) == "X"):
+                prev = int((prev + 1 + rand) % 4)
+            print(prev)
             placeCorner(board, prev)
     elif(move == 2):
         if (getCellByNum(board, getNumBetweenCorners(prevList[1], prevList[2])) != "X"):
@@ -110,15 +113,22 @@ def aiTurn(board, move, prevList):
         else:
             a = len(prevList) - 2
             b = prev
+            if (a == 0):
+                a += 4
+            if (b == 0):
+                b += 4
             small = min(a, b)
             large = max(a, b)
             if (getCellByNum(board, cornerToRegNum(int((large + 1) % 4))) == "X"):
                 prev = int((small + 3) % 4)
+                print("a")
             elif(getCellByNum(board, cornerToRegNum(int((small + 3) % 4))) == "X"):
                 prev = int((large + 1) % 4)
+                print("b")
             else:
                 rand = random.randint(0, 1);
-                prev = int((large + 1 + prev) % 4)
+                prev = int((large + 1 + rand) % 4)
+                print("c")
             print(prev)
             placeCorner(board, prev)
     elif(move == 3):
@@ -127,7 +137,7 @@ def aiTurn(board, move, prevList):
         elif(getCellByNum(board, getNumBetweenCorners(prevList[3], prevList[2])) == " "):
             prev = getNumBetweenCorners(prevList[3], prevList[2])
         setCellByNum(board, prev, "O")
-    else:   
+    else:
         for i in range(9):
             if (getCellByNum(board, i + 1)):
                 prev = i + 1
