@@ -10,13 +10,18 @@ def displayBoard(board):
             print("-----")
 
 def checkForWinLine(line):
-    if (" " != board[0] == board[1] == board[2]):
+    if (" " != line[0] == line[1] == line[2]):
         return True;
 
 def checkForWin(board):
-    return (checkForWinLine(board[0]) || checkForWinLine(board[1]) || checkForWinLine(board[2]) ||
-        checkForWinLine([board[0][0], board[0][1], board[0][2]]]) || checkForWinLine([board[1][0], board[1][1], board[1][2]]]) || checkForWinLine([board[2][0], board[2][1], board[2][2]]]) ||
-        checkForWinLine([board[0][0], board[1][1], board[2][2]]]) || checkForWinLine([board[2][0], board[1][1], board[0][2]]]))
+    return (checkForWinLine(board[0]) or
+            checkForWinLine(board[1]) or
+            checkForWinLine(board[2]) or
+            checkForWinLine([board[0][0], board[1][0], board[2][0]]) or
+            checkForWinLine([board[0][1], board[1][1], board[2][1]]) or
+            checkForWinLine([board[0][2], board[1][2], board[2][2]]) or
+            checkForWinLine([board[0][0], board[1][1], board[2][2]]) or
+            checkForWinLine([board[2][0], board[1][1], board[0][2]]))
 
 def checkForTie(board):
     for x in range(len(board)):
@@ -33,10 +38,20 @@ def checkBoard(board):
     else:
         return "continue game"
 
+def userTurn(board):
+    num = int(input("Where would you like to move? ")) - 1
+    board[int(num / 3)][num % 3] = "X"
+    displayBoard(board)
 
+def aiTurn(board):
+    return ""
 
+def gamePlay(board):
+    userTurn(board);
+    while(checkBoard(board) == "continue game"):
+        aiTurn(board)
+        userTurn(board);
+    print(checkBoard(board))
 
 board = [ [" ", " ", " "], [" ", " ", " "], [" ", " ", " "] ]
-checkForWinRow(board)
-
-displayBoard(board)
+gamePlay(board)
