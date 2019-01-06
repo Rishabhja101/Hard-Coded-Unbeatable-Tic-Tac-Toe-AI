@@ -3,7 +3,7 @@ import os
 
 def displayBoard(board):
     clear = lambda: os.system('cls')
-    clear()
+#    clear()
     for x in range(len(board)):
         line = ""
         for y in range(len(board[0])):
@@ -27,6 +27,37 @@ def checkForWin(board):
             checkForWinLine([board[0][2], board[1][2], board[2][2]]) or
             checkForWinLine([board[0][0], board[1][1], board[2][2]]) or
             checkForWinLine([board[2][0], board[1][1], board[0][2]]))
+
+def checkForPossibleWinLine(line, char):
+    if ((line[0] == line[1] == char or line [0] == line[2] == char or line[1] == line[2] == char) and (line[0] == " " or line[1] == " " or line[2] == " ")):
+        if (line[0] == " "):
+            return 0
+        elif(line[1] == " "):
+            return 1
+        elif(line[2] == " "):
+            return 2
+    else:
+        return -1
+
+def checkForPossibleWin(board, char):
+    if (checkForPossibleWinLine(board[0], char) != -1):
+        return checkForPossibleWinLine(board[0], char) + 1
+    elif(checkForPossibleWinLine(board[1], char) != -1):
+        return checkForPossibleWinLine(board[1], char) + 4
+    elif(checkForPossibleWinLine(board[2], char) != -1):
+        return checkForPossibleWinLine(board[2], char) + 7
+    elif(checkForPossibleWinLine([board[0][0], board[1][0], board[2][0]], char) != -1):
+        return checkForPossibleWinLine([board[0][0], board[1][0], board[2][0]], char) * 3 + 1
+    elif(checkForPossibleWinLine([board[0][1], board[1][1], board[2][1]], char) != -1):
+        return checkForPossibleWinLine([board[0][1], board[1][1], board[2][1]], char) * 3 + 2
+    elif(checkForPossibleWinLine([board[0][2], board[1][2], board[2][2]], char) != -1):
+        return checkForPossibleWinLine([board[0][2], board[1][2], board[2][2]], char) * 3 + 2
+    elif(checkForPossibleWinLine([board[0][0], board[1][1], board[2][2]], char) != -1):
+        return checkForPossibleWinLine([board[0][0], board[1][1], board[2][2]], char) * 4 + 1
+    elif(checkForPossibleWinLine([board[0][2], board[1][1], board[2][0]], char) != -1):
+        return checkForPossibleWinLine([board[2][0], board[1][1], board[0][2]], char) * 2 + 3
+    else:
+        return -1
 
 def checkForTie(board):
     for x in range(len(board)):
@@ -89,8 +120,25 @@ def cornerToRegNum(num):
         return 9
     elif(num == 3):
         return 7
+def goalIsTie(board, goal):
+    if(goal == "tie"):
+        n = checkForPossibleWin(board, "O")
+        if (n != -1):
+            setCellByNum(board, n, "O")
+        else:
+            n = checkForPossibleWin(board, "X")
+            if (n != -1):
+                setCellByNum(board, n, "O")
+            else:
+                rand = random.randint(0, 9) + 1
+                while (getCellByNum(board, rand) != " "):
+                    rand = random.randint(0, 9) + 1
+                setCellByNum(board, rand, "O")
+        return True
+    else:
+        return False
 
-def aiTurn(board, move, prevList):
+def aiTurn(board, move, prevList, goal):
     prev = prevList[len(prevList) - 1]
     if (move == 0):
         rand = random.randint(0,3)
@@ -101,13 +149,17 @@ def aiTurn(board, move, prevList):
             prev = int((prev + 2) % 4)
             placeCorner(board, prev)
         else:
-            rand = 2 * random.randint(0, 1);
+            rand = 2 * random.randint(0, 1)
+            old = prev
             prev = int((prev + 3 + rand) % 4)
-            if (getCellByNum(board, cornerToRegNum(prev)) == "X"):
+            print(getNumBetweenCorners(cornerToRegNum(prev), old))
+            if (getCellByNum(board, cornerToRegNum(prev)) == "X" or getCellByNum(board, getNumBetweenCorners(prev, old)) == "X"):
                 prev = int((prev + 2) % 4)
             placeCorner(board, prev)
     elif(move == 2):
-        if (getCellByNum(board, getNumBetweenCorners(prevList[1], prevList[2])) != "X"):
+        if (goalIsTie(board, goal)):
+            print ()
+        elif (getCellByNum(board, getNumBetweenCorners(prevList[1], prevList[2])) != "X"):
             setCellByNum(board, getNumBetweenCorners(prevList[1], prevList[2]), "O")
         else:
             a = len(prevList) - 2
@@ -118,10 +170,10 @@ def aiTurn(board, move, prevList):
                 b += 4
             small = min(a, b)
             large = max(a, b)
-            if (getCellByNum(board, cornerToRegNum(int((large + 1) % 4))) == "X"):
+            if (getCellByNum(board, cornerToRegNum(int((large + 1) % 4))) == "X" or getCellByNum(board, getNumBetweenCorners(int((large + 1) % 4), large)) == "X"):
                 prev = int((small + 3) % 4)
                 print("a")
-            elif(getCellByNum(board, cornerToRegNum(int((small + 3) % 4))) == "X"):
+            elif(getCellByNum(board, cornerToRegNum(int((small + 3) % 4))) == "X" or getCellByNum(board, getNumBetweenCorners(int((small + 3) % 4), small)) == "X"):
                 prev = int((large + 1) % 4)
                 print("b")
             else:
@@ -131,7 +183,9 @@ def aiTurn(board, move, prevList):
             print(prev)
             placeCorner(board, prev)
     elif(move == 3):
-        if (getCellByNum(board, getNumBetweenCorners(prevList[3], prevList[1])) == " "):
+        if (goalIsTie(board, goal)):
+            print ()
+        elif (getCellByNum(board, getNumBetweenCorners(prevList[3], prevList[1])) == " "):
             prev = getNumBetweenCorners(prevList[3], prevList[1])
         elif(getCellByNum(board, getNumBetweenCorners(prevList[3], prevList[2])) == " "):
             prev = getNumBetweenCorners(prevList[3], prevList[2])
@@ -145,13 +199,16 @@ def aiTurn(board, move, prevList):
     return prev
 
 def gamePlay(board):
+    goal = "win"
     move = 0
     prev = [-1]
-    prev.append(aiTurn(board, move, prev))
+    prev.append(aiTurn(board, move, prev, goal))
     while(checkBoard(board) == "continue game"):
         move += 1
         userTurn(board);
-        prev.append(aiTurn(board, move, prev))
+        if (move == 1 and board[1][1] == "X"):
+            goal = "tie"
+        prev.append(aiTurn(board, move, prev, goal))
     print(checkBoard(board))
 
 board = [ [" ", " ", " "], [" ", " ", " "], [" ", " ", " "] ]
