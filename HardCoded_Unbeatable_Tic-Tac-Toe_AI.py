@@ -3,7 +3,7 @@ import os
 
 def displayBoard(board):
     clear = lambda: os.system('cls')
-#    clear()
+    clear()
     for x in range(len(board)):
         line = ""
         for y in range(len(board[0])):
@@ -29,35 +29,37 @@ def checkForWin(board):
             checkForWinLine([board[2][0], board[1][1], board[0][2]]))
 
 def checkForPossibleWinLine(line, char):
+    ret = -1
     if ((line[0] == line[1] == char or line [0] == line[2] == char or line[1] == line[2] == char) and (line[0] == " " or line[1] == " " or line[2] == " ")):
         if (line[0] == " "):
-            return 0
+            ret =  0
         elif(line[1] == " "):
-            return 1
+            ret = 1
         elif(line[2] == " "):
-            return 2
-    else:
-        return -1
+            ret = 2
+    return ret
 
 def checkForPossibleWin(board, char):
+    ret = -1
     if (checkForPossibleWinLine(board[0], char) != -1):
-        return checkForPossibleWinLine(board[0], char) + 1
+        ret = checkForPossibleWinLine(board[0], char) + 1
     elif(checkForPossibleWinLine(board[1], char) != -1):
-        return checkForPossibleWinLine(board[1], char) + 4
+        ret = checkForPossibleWinLine(board[1], char) + 4
     elif(checkForPossibleWinLine(board[2], char) != -1):
-        return checkForPossibleWinLine(board[2], char) + 7
+        ret = checkForPossibleWinLine(board[2], char) + 7
     elif(checkForPossibleWinLine([board[0][0], board[1][0], board[2][0]], char) != -1):
-        return checkForPossibleWinLine([board[0][0], board[1][0], board[2][0]], char) * 3 + 1
+        ret = checkForPossibleWinLine([board[0][0], board[1][0], board[2][0]], char) * 3 + 1
     elif(checkForPossibleWinLine([board[0][1], board[1][1], board[2][1]], char) != -1):
-        return checkForPossibleWinLine([board[0][1], board[1][1], board[2][1]], char) * 3 + 2
+        ret = checkForPossibleWinLine([board[0][1], board[1][1], board[2][1]], char) * 3 + 2
     elif(checkForPossibleWinLine([board[0][2], board[1][2], board[2][2]], char) != -1):
-        return checkForPossibleWinLine([board[0][2], board[1][2], board[2][2]], char) * 3 + 2
+        ret = checkForPossibleWinLine([board[0][2], board[1][2], board[2][2]], char) * 3 + 3
     elif(checkForPossibleWinLine([board[0][0], board[1][1], board[2][2]], char) != -1):
-        return checkForPossibleWinLine([board[0][0], board[1][1], board[2][2]], char) * 4 + 1
+        ret = checkForPossibleWinLine([board[0][0], board[1][1], board[2][2]], char) * 4 + 1
     elif(checkForPossibleWinLine([board[0][2], board[1][1], board[2][0]], char) != -1):
-        return checkForPossibleWinLine([board[2][0], board[1][1], board[0][2]], char) * 2 + 3
-    else:
-        return -1
+        ret = checkForPossibleWinLine([board[0][2], board[1][1], board[2][0]], char) * 2 + 3
+    print(ret)
+    print(getCellByNum(board, ret))
+    return ret
 
 def checkForTie(board):
     for x in range(len(board)):
@@ -152,13 +154,12 @@ def aiTurn(board, move, prevList, goal):
             rand = 2 * random.randint(0, 1)
             old = prev
             prev = int((prev + 3 + rand) % 4)
-            print(getNumBetweenCorners(cornerToRegNum(prev), old))
             if (getCellByNum(board, cornerToRegNum(prev)) == "X" or getCellByNum(board, getNumBetweenCorners(prev, old)) == "X"):
                 prev = int((prev + 2) % 4)
             placeCorner(board, prev)
     elif(move == 2):
         if (goalIsTie(board, goal)):
-            print ()
+            print ("a")
         elif (getCellByNum(board, getNumBetweenCorners(prevList[1], prevList[2])) != "X"):
             setCellByNum(board, getNumBetweenCorners(prevList[1], prevList[2]), "O")
         else:
@@ -172,27 +173,24 @@ def aiTurn(board, move, prevList, goal):
             large = max(a, b)
             if (getCellByNum(board, cornerToRegNum(int((large + 1) % 4))) == "X" or getCellByNum(board, getNumBetweenCorners(int((large + 1) % 4), large)) == "X"):
                 prev = int((small + 3) % 4)
-                print("a")
             elif(getCellByNum(board, cornerToRegNum(int((small + 3) % 4))) == "X" or getCellByNum(board, getNumBetweenCorners(int((small + 3) % 4), small)) == "X"):
                 prev = int((large + 1) % 4)
-                print("b")
             else:
                 rand = random.randint(0, 1);
                 prev = int((large + 1 + rand) % 4)
-                print("c")
-            print(prev)
             placeCorner(board, prev)
     elif(move == 3):
         if (goalIsTie(board, goal)):
-            print ()
+            print ("b")
         elif (getCellByNum(board, getNumBetweenCorners(prevList[3], prevList[1])) == " "):
             prev = getNumBetweenCorners(prevList[3], prevList[1])
+            setCellByNum(board, prev, "O")
         elif(getCellByNum(board, getNumBetweenCorners(prevList[3], prevList[2])) == " "):
             prev = getNumBetweenCorners(prevList[3], prevList[2])
-        setCellByNum(board, prev, "O")
+            setCellByNum(board, prev, "O")
     else:
         for i in range(9):
-            if (getCellByNum(board, i + 1)):
+            if (getCellByNum(board, i + 1) == " "):
                 prev = i + 1
         setCellByNum(board, prev, "O")
     displayBoard(board)
