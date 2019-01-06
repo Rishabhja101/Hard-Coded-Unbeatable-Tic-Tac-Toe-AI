@@ -3,7 +3,7 @@ import os
 
 def displayBoard(board):
     clear = lambda: os.system('cls')
-#    clear()
+    clear()
     for x in range(len(board)):
         line = ""
         for y in range(len(board[0])):
@@ -104,8 +104,7 @@ def aiTurn(board, move, prevList):
             rand = 2 * random.randint(0, 1);
             prev = int((prev + 3 + rand) % 4)
             if (getCellByNum(board, cornerToRegNum(prev)) == "X"):
-                prev = int((prev + 1 + rand) % 4)
-            print(prev)
+                prev = int((prev + 2) % 4)
             placeCorner(board, prev)
     elif(move == 2):
         if (getCellByNum(board, getNumBetweenCorners(prevList[1], prevList[2])) != "X"):
